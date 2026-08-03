@@ -1,5 +1,6 @@
 import requests
 import pandas as pd
+import re
 
 url = "https://careers.homedepot.ca/job-search/jobs"
 headers = {
@@ -68,6 +69,9 @@ print(df.head())
 print(df.columns)
 print(df[["title","city"]])
 
+# Save row data in to the data/broze file folder
+df.to_csv("data/bronze/jobs_raw.csv", index = False)
+
 # Select required columns out of all the columns and stored in to the list because its not key-value pairs so can not be stored in dictionary
 selected_columns = ["reqId","title","location","city","state","type","salary","date","company","desc","applyUrl"]
 selected_columns
@@ -115,3 +119,39 @@ print(round(missing_salary_percentage,2))
 
 # To check the duplicated records on Requisition id. If the two jobs have same reqId means the jobs are duplicated
 new_df["requisition_id"].duplicated().sum()
+
+# Using regular expression, omit the other html content from the requesition_id column and only extract the
+# Req12345 number for simplification
+
+new_df["requisition_id"] = new_df["requisition_id"].str.extract(r"(Req\d+)", expand= False)
+new_df["requisition_id"].head()
+
+# Just to make sure that every requisition_id is clean
+print(new_df["requisition_id"].str.contains("<").sum())
+
+# To check every URL has clear apply to job link.
+(new_df["apply_url"] == "").sum()
+
+# Storing the length of new_df to varial
+total_jobs = len(new_df)
+duplicated_jobs = new_df["requisition_id"].duplicated().sum()
+missing_salary  = (new_df["salary"] == "").sum()
+missing_salary_percentage = round((missing_salary/total_jobs) * 100,1)
+missing_apply_url = (new_df["apply_url"] == "").sum()
+missing_job_title = (new_df["job_title"]== "").sum()
+
+
+print("=" * 45)
+print("     Data Quality Report")
+print("=" * 45)
+
+print(f"Total Jobs : {total_jobs}")
+print(f"Duplicate Jobs : {duplicated_jobs}")
+print(f"Missing Salary : {missing_salary}")
+print(f"Missing Salary (%) : {missing_salary_percentage}")
+print(f"Missing Job Title : {missing_job_title}")
+print(f"Missing Apply Url : {missing_apply_url}")
+
+print("=" * 45)
+
+new_df.to_csv("data/silver/jobs_cleaned.csv", index=False)
