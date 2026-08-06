@@ -69,20 +69,20 @@ print(df.head())
 print(df.columns)
 print(df[["title","city"]])
 
-# Save row data in to the data/broze file folder
+# Save row data into the data/broze file folder
 df.to_csv("data/bronze/jobs_raw.csv", index = False)
 
-# Select required columns out of all the columns and stored in to the list because its not key-value pairs so can not be stored in dictionary
+# Select required columns out of all the columns and stored in to the list because it's not key-value pairs, so it cannot be stored in a dictionary
 selected_columns = ["reqId","title","location","city","state","type","salary","date","company","desc","applyUrl"]
 selected_columns
 
-# Mapped the selected columns to actual dataframe df and stored in to new_df that has only selected columns values
+# Mapped the selected columns to the actual DataFrame df and stored in new_df that has only selected column values
 new_df = df[selected_columns]
 new_df
 print(new_df.head())
 print(new_df.shape) # Shape function gives total row and column value
 
-# Rename the columns name for easy understanding 
+# Rename the column names for easy understanding 
 column_names = {
     "reqId": "requisition_id",
     "title": "job_title",
@@ -101,26 +101,26 @@ column_names = {
 new_df = new_df.rename(columns=column_names)
 print(new_df.columns)
 
-# info() function will give info of the dataset. How many rows and columns,if row has non numm or null values datatypes  and memory usage
+# info() function will give info of the dataset. How many rows and columns, if rows have non-numeric or null values, data types,  and memory usage
 new_df.info()
 print(new_df["salary"].unique()) # unique function will give only unique values of salaries. Not includes duplicates
 
-# compare the salary to empty string and generate output as row1 = True and row 2 = False
+# compare the salary to an empty string and generate output as row1 = True and row 2 = False
 new_df["salary"] == ""
 print(new_df)
 
 # count how many salary has empty string.(sum of True count 1+0+1+1 = 3)
 (new_df["salary"] == "").sum()
 
-# To find how many percentage of the jobs has emptystring means no values in the salary columns.(Missing salary values)
+# To find what percentage of the jobs has emptystring means no values in the salary column. (Missing salary values)
 missing_salary_percentage = ((new_df["salary"] == "").sum() / len(new_df)) * 100
 print(round(missing_salary_percentage,2))
 
 
-# To check the duplicated records on Requisition id. If the two jobs have same reqId means the jobs are duplicated
+# To check the duplicated records on Requisition id. If the two jobs have the same reqId means the jobs are duplicated
 new_df["requisition_id"].duplicated().sum()
 
-# Using regular expression, omit the other html content from the requesition_id column and only extract the
+# Using regular expression, omit the other HTML content from the requisition_id column and only extract the
 # Req12345 number for simplification
 
 new_df["requisition_id"] = new_df["requisition_id"].str.extract(r"(Req\d+)", expand= False)
@@ -129,10 +129,10 @@ new_df["requisition_id"].head()
 # Just to make sure that every requisition_id is clean
 print(new_df["requisition_id"].str.contains("<").sum())
 
-# To check every URL has clear apply to job link.
+# To check every URL has a clear apply to job link.
 (new_df["apply_url"] == "").sum()
 
-# Storing the length of new_df to varial
+# Storing the length of new_df to a variable
 total_jobs = len(new_df)
 duplicated_jobs = new_df["requisition_id"].duplicated().sum()
 missing_salary  = (new_df["salary"] == "").sum()
